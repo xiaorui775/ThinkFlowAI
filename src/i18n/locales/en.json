@@ -37,11 +37,20 @@
     "layout": "LAYOUT",
     "center": "CENTER",
     "edge": "EDGE",
+    "edgeTypes": {
+      "default": "Bezier",
+      "straight": "Straight",
+      "step": "Step",
+      "smoothstep": "Smooth",
+      "simplebezier": "Simple"
+    },
     "lines": "LINES",
     "dots": "DOTS",
     "map": "MAP",
     "summary": "SUMMARY",
-    "export": "EXPORT"
+    "export": "EXPORT",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen"
   },
   "settings": {
     "title": "API Settings",

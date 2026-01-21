@@ -11,8 +11,9 @@ import { useI18n } from 'vue-i18n'
 // 画布：VueFlow 与可选插件
 import { VueFlow } from '@vue-flow/core'
 import { Background, BackgroundVariant } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
+import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
+import { Maximize, Minimize } from 'lucide-vue-next'
 
 // VueFlow 内置样式（必须引入，否则组件样式缺失）
 import '@vue-flow/core/dist/style.css'
@@ -31,8 +32,38 @@ import WindowNode from './components/WindowNode.vue'
 
 // 业务层：统一的状态与动作入口
 import { useThinkFlow } from './composables/useThinkFlow'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const { t, locale } = useI18n()
+
+/**
+ * 全屏控制逻辑
+ */
+const isFullscreen = ref(false)
+
+const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch((err) => {
+            console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`)
+        })
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen()
+        }
+    }
+}
+
+const handleFullscreenChange = () => {
+    isFullscreen.value = !!document.fullscreenElement
+}
+
+onMounted(() => {
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('fullscreenchange', handleFullscreenChange)
+})
 
 /**
  * 从业务层拿到全局状态与动作。
@@ -102,7 +133,7 @@ const fitToView = () => {
 
         <div class="flex-grow relative">
             <VueFlow
-                :default-edge-options="{ type: 'smoothstep' }"
+                :default-edge-options="{ type: config.edgeType }"
                 :fit-view-on-init="true"
                 class="bg-white"
                 :class="{ 'space-pressed': isSpacePressed }"
@@ -115,7 +146,11 @@ const fitToView = () => {
                     :gap="24"
                     :size="config.backgroundVariant === BackgroundVariant.Dots ? 1 : 0.5"
                 />
-                <Controls v-if="config.showControls" />
+                <Controls v-if="config.showControls" :show-fullscreen="false" :show-fit-view="false">
+                    <ControlButton @click="toggleFullscreen" :title="isFullscreen ? t('nav.exitFullscreen') : t('nav.fullscreen')">
+                        <component :is="isFullscreen ? Minimize : Maximize" class="w-4 h-4 text-slate-500" />
+                    </ControlButton>
+                </Controls>
                 <MiniMap v-if="config.showMiniMap" pannable zoomable />
 
                 <template #node-window="{ id, data, selected }">

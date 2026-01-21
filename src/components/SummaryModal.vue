@@ -9,6 +9,9 @@
 // 图标：标题/关闭/加载
 import { RefreshCw, Sparkles, X } from 'lucide-vue-next'
 
+// Markdown 渲染
+import MarkdownIt from 'markdown-it'
+
 /**
  * props：
  * - show：弹窗显示开关
@@ -22,6 +25,12 @@ const props = defineProps<{
     isSummarizing: boolean
     summaryContent: string
 }>()
+
+const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+})
 
 /**
  * close：关闭弹窗
@@ -59,10 +68,8 @@ const emit = defineEmits<{
                             <RefreshCw class="w-8 h-8 text-orange-500 animate-spin" />
                             <p class="text-sm font-bold text-slate-400 animate-pulse">{{ props.t('common.summarizing') }}</p>
                         </div>
-                        <div v-else class="prose prose-slate max-w-none">
-                            <div class="whitespace-pre-wrap text-slate-600 leading-relaxed text-sm md:text-base font-medium">
-                                {{ props.summaryContent }}
-                            </div>
+                        <div v-else class="markdown-body max-w-none">
+                            <div class="text-slate-600 leading-relaxed text-sm md:text-base font-medium" v-html="md.render(props.summaryContent)"></div>
                         </div>
                     </div>
 

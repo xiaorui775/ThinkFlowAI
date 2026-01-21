@@ -108,6 +108,14 @@ const callAndClose = (fn: () => void) => {
                     <span class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase">{{ props.t('nav.edge') }}</span>
                 </div>
 
+                <select v-model="props.config.edgeType" class="toolbar-select flex-shrink-0">
+                    <option value="default">{{ props.t('nav.edgeTypes.default') }}</option>
+                    <option value="straight">{{ props.t('nav.edgeTypes.straight') }}</option>
+                    <option value="step">{{ props.t('nav.edgeTypes.step') }}</option>
+                    <option value="smoothstep">{{ props.t('nav.edgeTypes.smoothstep') }}</option>
+                    <option value="simplebezier">{{ props.t('nav.edgeTypes.simplebezier') }}</option>
+                </select>
+
                 <select v-model="props.config.backgroundVariant" class="toolbar-select flex-shrink-0">
                     <option :value="BackgroundVariant.Lines">{{ props.t('nav.lines') }}</option>
                     <option :value="BackgroundVariant.Dots">{{ props.t('nav.dots') }}</option>
@@ -203,6 +211,14 @@ const callAndClose = (fn: () => void) => {
                 <input type="color" v-model="props.config.edgeColor" class="w-4 h-4 rounded cursor-pointer bg-transparent border-none" />
                 <span class="text-[10px] font-bold text-slate-500 uppercase">{{ props.t('nav.edge') }}</span>
             </div>
+
+            <select v-model="props.config.edgeType" class="toolbar-select">
+                <option value="default">{{ props.t('nav.edgeTypes.default') }}</option>
+                <option value="straight">{{ props.t('nav.edgeTypes.straight') }}</option>
+                <option value="step">{{ props.t('nav.edgeTypes.step') }}</option>
+                <option value="smoothstep">{{ props.t('nav.edgeTypes.smoothstep') }}</option>
+                <option value="simplebezier">{{ props.t('nav.edgeTypes.simplebezier') }}</option>
+            </select>
 
             <select v-model="props.config.backgroundVariant" class="toolbar-select">
                 <option :value="BackgroundVariant.Lines">{{ props.t('nav.lines') }}</option>

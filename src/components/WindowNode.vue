@@ -25,6 +25,9 @@ import {
     X
 } from 'lucide-vue-next'
 
+// Markdown 渲染
+import MarkdownIt from 'markdown-it'
+
 /**
  * props：
  * - id/data/selected：VueFlow 提供的节点数据
@@ -46,6 +49,12 @@ const props = defineProps<{
     generateNodeImage: (id: string, prompt: string) => void
     expandIdea: (param?: any, customInput?: string) => void
 }>()
+
+const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+})
 
 /**
  * preview：请求 App 打开图片预览弹窗
@@ -201,9 +210,11 @@ const getNodePosition = (id: string) => props.flowNodes.find(n => n.id === id)?.
                         </div>
                         <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest animate-pulse">{{ props.t('common.loading') }}</span>
                     </div>
-                    <div v-else class="text-[11px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap max-h-[350px] overflow-y-auto custom-scrollbar pr-2 selection:bg-orange-100 nowheel">
-                        {{ props.data.detailedContent }}
-                    </div>
+                    <div
+                        v-else
+                        class="markdown-body text-[11px] text-slate-600 leading-relaxed font-medium max-h-[350px] overflow-y-auto custom-scrollbar pr-2 selection:bg-orange-100 nowheel"
+                        v-html="md.render(props.data.detailedContent)"
+                    ></div>
                 </div>
 
                 <div class="relative group/input">
@@ -219,14 +230,14 @@ const getNodePosition = (id: string) => props.flowNodes.find(n => n.id === id)?.
                             @blur="isFocused = false"
                             @keyup.enter="props.expandIdea({ id: props.id, data: props.data, position: getNodePosition(props.id) }, props.data.followUp)"
                             :placeholder="props.t('node.followUp')"
-                            class="bg-transparent border-none outline-none text-[10px] font-bold text-slate-700 flex-grow placeholder:text-slate-300"
+                            class="bg-transparent border-none outline-none text-[10px] font-bold text-slate-700 flex-grow placeholder:text-slate-400"
                             :disabled="props.data.isExpanding"
                         />
                         <button
                             @click.stop="props.expandIdea({ id: props.id, data: props.data, position: getNodePosition(props.id) }, props.data.followUp)"
                             :disabled="!props.data.followUp?.trim() || props.data.isExpanding"
                             class="transition-all transform active:scale-90"
-                            :style="{ color: props.data.followUp?.trim() ? props.config.edgeColor : '#cbd5e1' }"
+                            :style="{ color: props.data.followUp?.trim() ? props.config.edgeColor : '#94a3b8' }"
                         >
                             <RefreshCw v-if="props.data.isExpanding" class="w-3.5 h-3.5 animate-spin" />
                             <ArrowRight v-else class="w-3.5 h-3.5" />

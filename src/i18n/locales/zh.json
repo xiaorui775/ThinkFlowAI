@@ -37,11 +37,20 @@
     "layout": "布局",
     "center": "起点",
     "edge": "连线",
+    "edgeTypes": {
+      "default": "曲线",
+      "straight": "直线",
+      "step": "折线",
+      "smoothstep": "圆角",
+      "simplebezier": "平滑"
+    },
     "lines": "网格",
     "dots": "点阵",
     "map": "地图",
     "summary": "总结",
-    "export": "导出"
+    "export": "导出",
+    "fullscreen": "全屏",
+    "exitFullscreen": "退出全屏"
   },
   "settings": {
     "title": "API 设置",

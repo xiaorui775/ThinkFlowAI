@@ -232,7 +232,7 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
 
     const config = reactive({
         edgeColor: '#fed7aa',
-        edgeStyle: 'smoothstep',
+        edgeType: 'default',
         backgroundVariant: BackgroundVariant.Lines,
         showControls: true,
         showMiniMap: true
@@ -245,12 +245,12 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
      * - 通过 lastAppliedStatus 避免无效重复 setEdges
      */
     watch(
-        [() => activeNodeId.value, () => config.edgeColor, () => flowEdges.value.length, () => flowNodes.value.some(n => n.data.isExpanding)],
-        ([, newColor, , anyExpanding]) => {
+        [() => activeNodeId.value, () => config.edgeColor, () => config.edgeType, () => flowEdges.value.length, () => flowNodes.value.some(n => n.data.isExpanding)],
+        ([, newColor, newType, , anyExpanding]) => {
             const { edgeIds } = activePath.value
             const edgeIdsStr = Array.from(edgeIds).sort().join(',')
 
-            const currentStatus = `${edgeIdsStr}-${newColor}-${anyExpanding}`
+            const currentStatus = `${edgeIdsStr}-${newColor}-${newType}-${anyExpanding}`
             if (lastAppliedStatus.value === currentStatus) return
             lastAppliedStatus.value = currentStatus
 
@@ -261,6 +261,7 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
 
                     return {
                         ...edge,
+                        type: newType,
                         animated: isHighlighted || isExpanding,
                         style: {
                             ...edge.style,
@@ -574,6 +575,7 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
                 source: parentId,
                 target: childId,
                 animated: true,
+                type: config.edgeType,
                 style: { stroke: config.edgeColor, strokeWidth: 2 },
                 markerEnd: MarkerType.ArrowClosed
             })

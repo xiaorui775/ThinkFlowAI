@@ -39,14 +39,14 @@ const emit = defineEmits<{
                 <input
                     :value="props.modelValue"
                     :placeholder="props.t('nav.placeholder')"
-                    class="flex-grow bg-transparent border-none outline-none text-xs md:text-sm font-bold text-slate-700 placeholder:text-slate-300 min-w-0"
+                    class="flex-grow bg-transparent border-none outline-none text-xs md:text-sm font-bold text-slate-700 placeholder:text-slate-400 min-w-0"
                     @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
                     @keyup.enter="emit('expand')"
                 />
                 <button
                     @click="emit('expand')"
                     :disabled="props.isLoading || !props.modelValue.trim()"
-                    class="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg md:rounded-xl transition-all active:scale-95 disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed group/btn flex-shrink-0"
+                    class="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg md:rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn flex-shrink-0"
                 >
                     <span class="text-[9px] md:text-[10px] font-black tracking-widest uppercase">{{ props.t('nav.execute') }}</span>
                     <Zap v-if="!props.isLoading" class="w-3.5 h-3.5 md:w-4 h-4 text-orange-400 group-hover/btn:scale-110 transition-transform" />
