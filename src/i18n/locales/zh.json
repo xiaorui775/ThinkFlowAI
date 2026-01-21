@@ -31,7 +31,7 @@
     "title": "ThinkFlow AI",
     "subtitle": "思维导图 & AI 助手",
     "placeholder": "在这里输入您的想法...",
-    "execute": "发散思维",
+    "execute": "提交问题",
     "reset": "重置",
     "fit": "适配",
     "layout": "布局",
@@ -46,7 +46,7 @@
   "settings": {
     "title": "API 设置",
     "subtitle": "配置您的 AI 接口地址",
-    "textGen": "文本生成 (Chat)",
+    "textGen": "文本生成",
     "imageGen": "图片生成",
     "baseUrl": "接口地址 (Base URL)",
     "modelName": "模型名称",
@@ -55,7 +55,7 @@
     "placeholderModel": "模型名称",
     "placeholderKey": "sk-...",
     "defaultModeTitle": "使用默认接口",
-    "defaultModeDesc": "请求目前正通过系统优化的默认 API 服务进行路由。"
+    "defaultModeDesc": "目前使用Bigmodel(智谱)提供的免费文本生成接口glm-4-flash和图片生成接口cogview-3-flash，为了更好的体验请自定义接口。"
   },
   "node": {
     "root": "根节点",
