@@ -28,7 +28,11 @@ import {
     LayoutDashboard,
     Focus,
     Target,
-    Map
+    Map,
+    Link as LinkIcon,
+    Shield,
+    Key,
+    Activity
 } from 'lucide-vue-next'
 import { VueFlow, useVueFlow, Position, MarkerType, Handle } from '@vue-flow/core'
 import { Background, BackgroundVariant } from '@vue-flow/background'
@@ -43,7 +47,53 @@ import '@vue-flow/minimap/dist/style.css'
 import '@vue-flow/controls/dist/style.css'
 
 // API 配置
-const API_KEY = import.meta.env.VITE_ZHIPU_AI_API_KEY
+const API_KEY = ''
+
+// API 详情配置
+const apiConfig = reactive({
+    mode: localStorage.getItem('api_mode') || 'default', // 'default' | 'custom'
+    chat: {
+        baseUrl: localStorage.getItem('chat_baseUrl') || '',
+        model: localStorage.getItem('chat_model') || '',
+        apiKey: localStorage.getItem('chat_apiKey') || ''
+    },
+    image: {
+        baseUrl: localStorage.getItem('image_baseUrl') || '',
+        model: localStorage.getItem('image_model') || '',
+        apiKey: localStorage.getItem('image_apiKey') || ''
+    }
+})
+
+// 默认配置常量
+const DEFAULT_CONFIG = {
+    chat: {
+        baseUrl: 'https://thinkflow.lz-t.top/chat/completions',
+        model: 'glm-4-flash',
+        apiKey: ''
+    },
+    image: {
+        baseUrl: 'https://thinkflow.lz-t.top/images/generations',
+        model: 'cogview-3-flash',
+        apiKey: ''
+    }
+}
+
+// 监听配置变化并保存
+watch(
+    () => apiConfig,
+    newVal => {
+        localStorage.setItem('api_mode', newVal.mode)
+        localStorage.setItem('chat_baseUrl', newVal.chat.baseUrl)
+        localStorage.setItem('chat_model', newVal.chat.model)
+        localStorage.setItem('chat_apiKey', newVal.chat.apiKey)
+        localStorage.setItem('image_baseUrl', newVal.image.baseUrl)
+        localStorage.setItem('image_model', newVal.image.model)
+        localStorage.setItem('image_apiKey', newVal.image.apiKey)
+    },
+    { deep: true }
+)
+
+const showSettings = ref(false)
 
 // VueFlow 实例
 const { addNodes, addEdges, onConnect, setNodes, setEdges, nodes: flowNodes, edges: flowEdges, updateNode, fitView, onNodeDragStart, onNodeDragStop } = useVueFlow()
@@ -265,15 +315,19 @@ const generateNodeImage = async (nodeId: string, prompt: string) => {
 
     updateNode(nodeId, { data: { ...node.data, isImageLoading: true } })
 
+    const useConfig = apiConfig.mode === 'default' ? DEFAULT_CONFIG.image : apiConfig.image
+    // 自定义模式下完全使用用户输入，不进行项目 Key 兜底
+    const finalApiKey = apiConfig.mode === 'default' ? useConfig.apiKey || API_KEY : useConfig.apiKey
+
     try {
-        const response = await fetch('https://open.bigmodel.cn/api/paas/v4/images/generations', {
+        const response = await fetch(useConfig.baseUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${API_KEY}`
+                Authorization: `Bearer ${finalApiKey}`
             },
             body: JSON.stringify({
-                model: 'cogview-3-flash',
+                model: useConfig.model,
                 prompt: `生成一张图片，表现主题：${prompt}。要求：构图简洁，色彩明快，适合作为思维导图的视觉辅助。`
             })
         })
@@ -360,15 +414,19 @@ const expandIdea = async (param?: any, customInput?: string) => {
         userMessage = `核心想法: ${text}`
     }
 
+    const useConfig = apiConfig.mode === 'default' ? DEFAULT_CONFIG.chat : apiConfig.chat
+    // 自定义模式下完全使用用户输入，不进行项目 Key 兜底
+    const finalApiKey = apiConfig.mode === 'default' ? useConfig.apiKey || API_KEY : useConfig.apiKey
+
     try {
-        const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+        const response = await fetch(useConfig.baseUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${API_KEY}`
+                Authorization: `Bearer ${finalApiKey}`
             },
             body: JSON.stringify({
-                model: 'glm-4-flash',
+                model: useConfig.model,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: userMessage }
@@ -537,6 +595,14 @@ const startNewSession = () => {
                         <Download class="w-4 h-4" />
                         <span>EXPORT</span>
                     </button>
+
+                    <div class="h-4 w-[1px] bg-slate-100 mx-1"></div>
+
+                    <!-- 设置按钮 -->
+                    <button @click="showSettings = true" class="toolbar-btn text-slate-600 hover:bg-slate-50 border-slate-100">
+                        <Settings class="w-4 h-4" />
+                        <span>API SETTINGS</span>
+                    </button>
                 </div>
             </div>
 
@@ -704,6 +770,156 @@ const startNewSession = () => {
 
             <!-- 浮动 UI 层 -->
             <div class="absolute inset-0 pointer-events-none z-10 p-12"></div>
+
+            <!-- 设置弹窗 -->
+            <div v-if="showSettings" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="showSettings = false">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in duration-300">
+                    <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-slate-900 rounded-xl text-white">
+                                <Settings class="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-slate-900 tracking-tight">API Settings</h3>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Configure your AI endpoints</p>
+                            </div>
+                        </div>
+                        <button @click="showSettings = false" class="p-2 hover:bg-slate-200 rounded-xl transition-colors">
+                            <X class="w-5 h-5 text-slate-500" />
+                        </button>
+                    </div>
+
+                    <div class="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <!-- 模式切换 -->
+                        <div class="flex p-1.5 bg-slate-100 rounded-2xl w-fit">
+                            <button
+                                @click="apiConfig.mode = 'default'"
+                                class="px-6 py-2 rounded-xl text-xs font-black tracking-widest transition-all"
+                                :class="apiConfig.mode === 'default' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            >
+                                DEFAULT
+                            </button>
+                            <button
+                                @click="apiConfig.mode = 'custom'"
+                                class="px-6 py-2 rounded-xl text-xs font-black tracking-widest transition-all"
+                                :class="apiConfig.mode === 'custom' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            >
+                                CUSTOM
+                            </button>
+                        </div>
+
+                        <!-- 文本生成配置 -->
+                        <div v-if="apiConfig.mode === 'custom'" class="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <div class="flex items-center gap-2 text-slate-900">
+                                <Sparkles class="w-4 h-4 text-orange-500" />
+                                <span class="text-sm font-black uppercase tracking-widest">Text Generation (Chat)</span>
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <div class="space-y-1.5">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                        <LinkIcon class="w-3 h-3" /> Base URL
+                                    </label>
+                                    <input
+                                        v-model="apiConfig.chat.baseUrl"
+                                        type="text"
+                                        placeholder="https://api.example.com/v1/chat/completions"
+                                        class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all font-mono"
+                                    />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                            <Shield class="w-3 h-3" /> Model Name
+                                        </label>
+                                        <input
+                                            v-model="apiConfig.chat.model"
+                                            type="text"
+                                            placeholder="glm-4-flash"
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all font-mono"
+                                        />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                            <Key class="w-3 h-3" /> API Key
+                                        </label>
+                                        <input
+                                            v-model="apiConfig.chat.apiKey"
+                                            type="password"
+                                            placeholder="sk-..."
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all font-mono"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 图片生成配置 -->
+                        <div v-if="apiConfig.mode === 'custom'" class="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <div class="flex items-center gap-2 text-slate-900">
+                                <ImageIcon class="w-4 h-4 text-blue-500" />
+                                <span class="text-sm font-black uppercase tracking-widest">Image Generation</span>
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <div class="space-y-1.5">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                        <LinkIcon class="w-3 h-3" /> Base URL
+                                    </label>
+                                    <input
+                                        v-model="apiConfig.image.baseUrl"
+                                        type="text"
+                                        placeholder="https://api.example.com/v1/images/generations"
+                                        class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                                    />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                            <Shield class="w-3 h-3" /> Model Name
+                                        </label>
+                                        <input
+                                            v-model="apiConfig.image.model"
+                                            type="text"
+                                            placeholder="cogview-3-flash"
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                                        />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                            <Key class="w-3 h-3" /> API Key
+                                        </label>
+                                        <input
+                                            v-model="apiConfig.image.apiKey"
+                                            type="password"
+                                            placeholder="sk-..."
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 默认模式提示 -->
+                        <div v-if="apiConfig.mode === 'default'" class="flex flex-col items-center justify-center py-12 text-center space-y-4 animate-in fade-in duration-500">
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                                <Activity class="w-8 h-8 text-slate-400" />
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-sm font-black text-slate-900 uppercase">Using Default Endpoint</h4>
+                                <p class="text-xs text-slate-500 max-w-[280px]">Requests are currently being routed through the system's optimized default API service.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+                        <button
+                            @click="showSettings = false"
+                            class="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-95"
+                        >
+                            SAVE CONFIGURATION
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- 全局图片预览弹窗 -->
             <div v-if="previewImageUrl" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-10" @click="previewImageUrl = null">
