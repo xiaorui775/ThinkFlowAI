@@ -103,6 +103,8 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
         nodes: flowNodes,
         edges: flowEdges,
         updateNode,
+        removeNodes,
+        removeEdges,
         fitView,
         onNodeDragStart,
         onNodeDragStop
@@ -174,6 +176,17 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
             }
         })
         return ids
+    }
+
+    /**
+     * 删除指定节点的所有后代节点
+     * 用于在重新扩展某个节点时，清空其原有的子树
+     */
+    const removeDescendants = (nodeId: string) => {
+        const descendantIds = getDescendantIds(nodeId)
+        if (descendantIds.size > 0) {
+            removeNodes(Array.from(descendantIds))
+        }
     }
 
     /**
@@ -662,6 +675,11 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
             }
             const data = await response.json()
             const result = JSON.parse(data.choices[0].message.content)
+
+            // 如果是重新扩展已有节点，先清空其现有的所有后代节点
+            if (parentNode && currentParentId) {
+                removeDescendants(currentParentId)
+            }
 
             const parentNodeObj = flowNodes.value.find(n => n.id === currentParentId)
             const startX = parentNodeObj ? parentNodeObj.position.x : 50
