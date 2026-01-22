@@ -4,7 +4,7 @@ English | [中文](./README.zh-CN.md)
 
 ThinkFlow AI is a lightweight, local-first idea-to-structure workspace. You type a core idea, and the app expands it into a navigable knowledge graph (modules/submodules). Each node supports follow-up expansion, deep-dive details, and optional image generation.
 
-This repository currently uses the package name `housegpt` (historical) while the product name is **ThinkFlow AI**.
+This repository currently uses the package name `thinkflow` (historical) while the product name is **ThinkFlow AI**.
 
 ## Highlights
 
@@ -46,8 +46,8 @@ ThinkFlow AI is built around a single composable:
 - UI components are “thin”: they render and forward events (expand, deep-dive, image, export).
 - The graph is rendered with VueFlow using a custom node type (`window`).
 - Settings are stored in `localStorage`:
-  - language (`language`)
-  - API mode + chat/image endpoints/models/keys
+    - language (`language`)
+    - API mode + chat/image endpoints/models/keys
 
 ## Getting Started
 
@@ -90,13 +90,13 @@ Open **Settings** in the UI:
 
 - Switch to **Custom**
 - Configure **Text Generation** (chat completion)
-  - `baseUrl` (POST endpoint)
-  - `model`
-  - `apiKey`
+    - `baseUrl` (POST endpoint)
+    - `model`
+    - `apiKey`
 - Configure **Image Generation**
-  - `baseUrl` (POST endpoint)
-  - `model`
-  - `apiKey`
+    - `baseUrl` (POST endpoint)
+    - `model`
+    - `apiKey`
 
 These fields are saved into `localStorage` automatically.
 
@@ -136,9 +136,9 @@ Use **Export** in the top toolbar:
 
 - **Microsoft Clarity**: included in `index.html` for analytics.
 - **VueFlow plugins**:
-  - Background (Dots/Lines)
-  - Controls (zoom/fit)
-  - MiniMap (overview)
+    - Background (Dots/Lines)
+    - Controls (zoom/fit)
+    - MiniMap (overview)
 
 ## Internationalization (i18n)
 

@@ -4,8 +4,6 @@
 
 ThinkFlow AI 是一个轻量、偏本地化（Local-first）的“从想法到结构化图谱”的工作台：输入一个核心想法，应用会把它扩展为可浏览的知识图谱（模块/子模块）。每个节点支持继续追问扩展、深挖详情，以及可选的配图生成。
 
-说明：当前仓库的 npm 包名仍为 `housegpt`（历史原因），产品名称为 **ThinkFlow AI**。
-
 ## 亮点功能
 
 - **想法扩展为图谱**：生成根节点并扩展出结构化子节点。
@@ -46,8 +44,8 @@ ThinkFlow AI 是一个轻量、偏本地化（Local-first）的“从想法到�
 - 组件尽量“轻”：负责渲染与事件转发（expand、deep-dive、image、export 等）。
 - 画布由 VueFlow 渲染，节点使用自定义类型 `window`。
 - 配置持久化到 `localStorage`：
-  - 语言：`language`
-  - API 模式与 chat/image 的 baseUrl/model/apiKey
+    - 语言：`language`
+    - API 模式与 chat/image 的 baseUrl/model/apiKey
 
 ## 快速开始
 
@@ -90,13 +88,13 @@ npm run preview
 
 - 切换到 **Custom**
 - 配置 **文本生成（chat completion）**
-  - `baseUrl`（POST 接口地址）
-  - `model`
-  - `apiKey`
+    - `baseUrl`（POST 接口地址）
+    - `model`
+    - `apiKey`
 - 配置 **图片生成**
-  - `baseUrl`（POST 接口地址）
-  - `model`
-  - `apiKey`
+    - `baseUrl`（POST 接口地址）
+    - `model`
+    - `apiKey`
 
 这些字段会自动保存到 `localStorage`。
 
@@ -139,9 +137,9 @@ npm run preview
 
 - **Microsoft Clarity**：在 `index.html` 中引入，用于分析与统计。
 - **VueFlow 插件**：
-  - Background（Dots/Lines）
-  - Controls（缩放/适配）
-  - MiniMap（总览）
+    - Background（Dots/Lines）
+    - Controls（缩放/适配）
+    - MiniMap（总览）
 
 ## 国际化（i18n）
 
