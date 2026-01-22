@@ -1,116 +1,120 @@
 # ThinkFlow AI
 
-English | [中文](./README.zh-CN.md)
+中文 | [English](./README.en.md)
 
-ThinkFlow AI is a lightweight, local-first, AI-driven mind mapping workspace. It automatically transforms a simple idea into a structured and highly visual mind map using the divergent thinking power of AI.
-
-This project aims to provide a smooth, zero-backend-config thinking assistant that offers deep analytical capabilities, supporting users during brainstorming, knowledge organization, and creative expansion.
+**ThinkFlow AI** 是一款基于 Vue 3 和 VueFlow 构建的次世代、本地优先（Local-first）AI 驱动思维导图工具。它不仅仅是一个绘图软件，更是一个能够与你共同思考的“脑力增幅器”。通过将 LLM（大语言模型）的发散性能力与结构化可视化相结合，ThinkFlow AI 能将模糊的想法迅速转化为清晰、深度的知识体系。
 
 ---
 
-## 🌟 Key Highlights
+## 🔗 在线预览
 
-- **🚀 Idea to Graph**: Just enter a core concept, and the AI will automatically generate a root node and expand into multiple insightful child nodes.
-- **🧠 Context-Aware Follow-up**: Support for follow-up questions on any node. The AI considers the "thinking path" from root to the current node to ensure logical consistency.
-- **📖 Deep Answer (Deep Dive)**: More than just keywords—click "Answer" to have the AI generate detailed analysis, background, and applications for a node, rendered in Markdown.
-- **🎨 Intelligent Visual Aid**: Integrated AI image generation creates realistic visuals based on node content, enhancing the visual impact and memory retention of your mind map.
-- **📊 Session Summary**: One-click summary of the entire canvas, extracting core logic, main dimensions, and final insights.
-- **📂 Structured Export**: Export the entire mind map as a standard Markdown outline, including node descriptions, answers, and hierarchical structure.
-- **🔐 Local-First Configuration**: All API configurations (Key, Base URL, etc.) and language preferences are stored in the browser's `localStorage`, ensuring privacy and security.
+立即体验：[https://thinkflow-ai.lz-t.top/](https://thinkflow-ai.lz-t.top/)
 
 ---
 
-## 🛠️ Tech Stack
+## 🌟 为什么选择 ThinkFlow AI？
 
-- **Framework**: [Vue 3](https://vuejs.org/) (Composition API)
-- **Build Tool**: [Vite 5](https://vitejs.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Graph Engine**: [@vue-flow/core](https://vueflow.dev/)
-- **I18n**: [vue-i18n](https://vue-i18n.intlify.dev/)
-- **Icon Library**: [lucide-vue-next](https://lucide.dev/)
-- **Markdown Rendering**: [markdown-it](https://github.com/markdown-it/markdown-it)
+传统的思维导图工具往往需要手动录入每一个分支，这在灵感爆发时往往会成为阻碍。ThinkFlow AI 重新定义了这一过程：
+
+1.  **AI 驱动的自动化发散**：输入一个核心词，AI 会基于逻辑链路自动向外扩展，帮助你打破“白纸焦虑”。
+2.  **上下文感知的深度对话**：每一个节点都带有其在思维树中的完整路径上下文，这意味着 AI 能够理解你为什么从 A 想到 B，从而生成更精准的后续建议。
+3.  **多维度的感官呈现**：通过深度“回答（Answer）”获取文本知识，通过 AI 生图获取视觉意象，通过“全篇总结”获取宏观洞察。
+4.  **极致的隐私与自由**：采用本地优先架构，配置存储在浏览器本地，支持任何 OpenAI 兼容接口，不锁定任何平台。
 
 ---
 
-## 📂 Code Structure Guide
+## 🚀 核心功能架构
+
+### 1. 智能扩展系统
+
+- **核心想法激活**：一键生成思维树根基。
+- **路径上下文追问**：对节点进行 Follow-up，AI 将结合从根节点到当前节点的完整逻辑路径进行推理。
+- **节点折叠与管理**：支持大规模图谱的子树折叠，保持视野清爽。
+
+### 2. 内容深挖与总结
+
+- **深度回答 (Deep Dive)**：针对特定概念生成 300-500 字的专业解析，支持 Markdown 丰富格式。
+- **视觉生成 (Image Gen)**：利用 CogView 或 DALL-E 为节点生成写实风格配图，强化视觉记忆。
+- **全局摘要 (Summary)**：自动分析全图逻辑，提取核心洞察与结论。
+
+### 3. 画布交互与排版
+
+- **智能树形布局**：内置基于子树高度动态计算的算法，解决节点展开后的重叠问题。
+- **联动拖拽**：父节点移动时，子节点保持相对位置同步移动。
+- **多样化导出**：完美支持导出为结构化 Markdown，保留所有深度回答内容。
+
+---
+
+## 🛠️ 技术栈
+
+| 维度         | 技术选型                            |
+| :----------- | :---------------------------------- |
+| **前端框架** | Vue 3 (Composition API)             |
+| **构建工具** | Vite 5 + TypeScript                 |
+| **画布引擎** | @vue-flow/core (高性能、高度定制化) |
+| **UI/样式**  | Tailwind CSS + Lucide Icons         |
+| **国际化**   | Vue-I18n (中英双语无缝切换)         |
+| **Markdown** | Markdown-it (支持节点内容渲染)      |
+
+---
+
+## 📂 源码结构
 
 ```text
 src/
-├── components/             # UI Components
-│   ├── TopNav.vue          # Top toolbar: Handles fit, layout, export, summary, and language toggle.
-│   ├── SideNav.vue         # Left side nav: Controls MiniMap, edge styles, background, and settings entry.
-│   ├── BottomBar.vue       # Bottom input bar: Initial entry for core ideas.
-│   ├── WindowNode.vue      # Custom Node: Core UI for expanding, answers, image generation, and follow-ups.
-│   ├── SettingsModal.vue   # API Settings: Configuration for Text and Image generation endpoints.
-│   ├── SummaryModal.vue    # Modal for displaying the session summary.
-│   ├── ImagePreviewModal.vue # Modal for fullscreen node image preview.
-│   └── ResetConfirmModal.vue # Confirmation modal for canvas reset.
-├── composables/            # Core Logic Layer
-│   └── useThinkFlow.ts     # Core Business Hook: Manages node state, API calls, layout algorithms, and persistence.
-├── i18n/                   # Internationalization
-│   ├── locales/            # Language packs (zh.json, en.json)
-│   └── index.ts            # I18n initialization
-├── App.vue                 # App Entry: Composes components and configures the VueFlow environment.
-└── main.ts                 # Program Entry Point
+├── components/             # UI 组件层
+│   ├── WindowNode.vue      # 核心逻辑载体：自定义节点，集成生图/回答/追问能力
+│   ├── TopNav.vue          # 全局控制：布局算法触发、导出、总结、全屏等
+│   ├── SideNav.vue         # 视图配置：小地图、连线样式、背景切换、设置入口
+│   ├── BottomBar.vue       # 想法入口：灵感触发点
+│   └── ...Modals           # 弹窗逻辑：设置、预览、重置确认等
+├── composables/            # 领域逻辑层
+│   └── useThinkFlow.ts     # 业务心脏：响应式状态管理、API 调度、排版算法实现
+├── i18n/                   # 语言资产
+│   └── locales/            # zh.json / en.json 翻译文件
+├── App.vue                 # 应用骨架：VueFlow 容器配置与组件组装
+└── main.ts                 # 入口文件
 ```
-
-### Core Design Principles
-
-- **State Management**: Uses `useThinkFlow` composable to centralize management of nodes, edges, and UI states, distributed to child components via `App.vue`.
-- **Layout Algorithm**: Implements a horizontal tree layout algorithm based on dynamic subtree height calculations, automatically adapting to node size changes.
-- **API Communication**: Compatible with OpenAI-style endpoints, supporting custom model names and Base URLs.
 
 ---
 
-## 🚀 Quick Start
+## ⚙️ API 服务说明 (重要)
 
-### 1. Prerequisites
+为了让用户能够开箱即用，本项目提供了一套默认的演示接口。
 
-- Node.js 18+
-- npm or pnpm
+### 1. 演示接口说明
 
-### 2. Install Dependencies
+- **服务转发**：默认请求通过 **Cloudflare Workers & Pages** 进行转发与控制。
+- **模型支持**：目前后端对接了智谱 Bigmodel (glm-4-flash / cogview-3-flash) 的免费额度。
+- **限制**：由于是公共演示接口，可能会存在请求频率限制或额度耗尽的情况。
+
+### 2. 进阶使用建议 (自定义接口)
+
+为了获得更稳定、更高质量的生成效果（例如使用 GPT-4o, Claude 3.5 Sonnet 等），强烈建议在 **设置 (Settings)** 中配置您自己的 API 端点：
+
+- **Base URL**: 您的 API 代理地址 (需支持 CORS)。
+- **Model**: 目标模型名称。
+- **API Key**: 您的私有密钥。
+
+_注：自定义模式下，请求将直接从您的浏览器发往目标端点，不经过任何中转，更加安全高效。_
+
+---
+
+## � 快速部署
 
 ```bash
+# 克隆仓库
+git clone https://github.com/your-repo/ThinkFlowAI.git
+
+# 安装依赖
 npm install
-```
 
-### 3. Run Development Server
-
-```bash
+# 启动开发
 npm run dev
+
+# 生产构建
+npm run build
 ```
 
-Access `http://localhost:5173` to start.
-
 ---
 
-## ⚙️ Configuration
-
-This project does not provide a backend; users must configure their own API endpoints:
-
-1. Click the **Settings** icon at the bottom of the left sidebar.
-2. **Default Mode**: Uses pre-configured trial endpoints (subject to rate limits).
-3. **Custom Mode**:
-    - **Text Gen**: Enter OpenAI-compatible `Base URL`, `Model Name`, and `API Key`.
-    - **Image Gen**: Enter configuration for `dall-e` or other image generation APIs.
-
----
-
-## 📖 Usage Manual
-
-1. **Start a Session**: Enter your idea in the bottom input (e.g., "Future of Urban Transportation") and press Enter.
-2. **Node Actions**:
-    - **Expand**: Click the `+` on a node or enter a follow-up requirement to generate child nodes.
-    - **Answer**: Click the book icon for a deep analysis of that node.
-    - **Image**: Click the image icon to generate a visual reference for the idea.
-3. **Organize Canvas**:
-    - **Layout**: Click the "Layout" button at the top to automatically organize all nodes.
-    - **Export**: Click the "Export" button at the top to get a Markdown copy of your work.
-
----
-
-## 📄 License
-
-MIT License
