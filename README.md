@@ -79,48 +79,64 @@ src/
 
 ---
 
-## ⚙️ 部署配置说明 (私有化部署必读)
+## 🚀 快速开始
 
-如果您希望私有化部署本项目（例如部署给公司内部或朋友使用），**强烈建议**您修改默认的后端服务配置，以免使用公共演示接口导致额度受限。
+```bash
+# 1. 克隆仓库
+git clone https://github.com/your-repo/ThinkFlowAI.git
 
-### 1. 修改默认配置
+# 2. 安装依赖
+npm install
+
+# 3. 启动开发环境
+npm run dev
+```
+
+---
+
+## ⚙️ API 服务说明 (公共演示)
+
+为了让用户能够开箱即用，本项目提供了一套默认的演示接口。
+
+- **服务转发**：默认请求通过 **Cloudflare Workers** 进行转发与控制。
+- **模型支持**：后端对接了智谱 Bigmodel (glm-4-flash / cogview-3-flash) 的免费额度。
+- **限制**：由于是公共演示接口，可能会存在请求频率限制或额度耗尽的情况。
+
+---
+
+## ⚙️ 部署与配置 (私有化部署必读)
+
+如果您希望私有化部署本项目（例如部署给公司内部或朋友使用），**建议**您按照以下步骤修改后端服务配置，以免使用公共演示接口导致额度受限。
+
+### 1. 修改默认 API 配置
 
 打开 `src/services/config.ts` 文件，修改 `DEFAULT_CONFIG` 常量：
 
 ```typescript
 // src/services/config.ts
-
-/**
- * 默认接口配置
- * 修改此处以指向您的私有 API 服务
- */
 export const DEFAULT_CONFIG = {
     chat: {
         // 您的 Chat 接口地址 (OpenAI 兼容格式)
         // 如果遇到跨域问题，可以配合 vite.config.ts 的 proxy 使用，例如填写 '/api/chat'
         baseUrl: 'https://your-private-api.com/v1/chat/completions',
-        // 默认使用的模型名称
-        model: '',
-        // (可选) 如果您的接口需要鉴权，可在此处填写 Key，或者留空让用户在前端设置中填写
-        apiKey: ''
+        model: 'gpt-4o',
+        apiKey: '' // (可选) 私有部署建议在此处填写默认 Key
     },
     image: {
-        // 您的生图接口地址
         baseUrl: 'https://your-private-api.com/v1/images/generations',
-        model: '',
+        model: 'dall-e-3',
         apiKey: ''
     }
 }
 ```
 
-### 2. 解决跨域问题 (CORS)
+### 2. 处理跨域问题 (CORS)
 
 如果您请求的 API 不支持跨域，可以在 `vite.config.ts` 中配置代理：
 
 ```typescript
 // vite.config.ts
 export default defineConfig({
-    // ... 其他配置
     server: {
         proxy: {
             '/api': {
@@ -135,49 +151,10 @@ export default defineConfig({
 
 配置代理后，将 `config.ts` 中的 `baseUrl` 修改为相对路径（如 `/api/chat/completions`）即可。
 
-### 3. 构建项目
+### 3. 构建生产版本
 
 ```bash
-npm run build
-```
-
----
-
-## ⚙️ API 服务说明 (公共演示)
-
-为了让用户能够开箱即用，本项目提供了一套默认的演示接口。
-
-### 1. 演示接口说明
-
-- **服务转发**：默认请求通过 **Cloudflare Workers & Pages** 进行转发与控制。
-- **模型支持**：目前后端对接了智谱 Bigmodel (glm-4-flash / cogview-3-flash) 的免费额度。
-- **限制**：由于是公共演示接口，可能会存在请求频率限制或额度耗尽的情况。
-
-### 2. 进阶使用建议 (自定义接口)
-
-为了获得更稳定、更高质量的生成效果（例如使用 GPT-4o, Claude 3.5 Sonnet 等），强烈建议在 **设置 (Settings)** 中配置您自己的 API 端点：
-
-- **Base URL**: 您的 API 代理地址 (需支持 CORS)。
-- **Model**: 目标模型名称。
-- **API Key**: 您的私有密钥。
-
-_注：自定义模式下，请求将直接从您的浏览器发往目标端点，不经过任何中转，更加安全高效。_
-
----
-
-## 📦 快速部署
-
-```bash
-# 克隆仓库
-git clone https://github.com/your-repo/ThinkFlowAI.git
-
-# 安装依赖
-npm install
-
-# 启动开发
-npm run dev
-
-# 生产构建
+# 执行构建
 npm run build
 ```
 

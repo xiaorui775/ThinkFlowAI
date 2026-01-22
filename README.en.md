@@ -79,34 +79,50 @@ src/
 
 ---
 
-## ⚙️ Deployment Configuration (Self-Hosting Guide)
+## 🚀 Quick Start
 
-If you wish to self-host this project (e.g., for internal use or sharing with friends), we **strongly recommend** modifying the default backend service configuration to avoid rate limits on the public demo endpoints.
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-repo/ThinkFlowAI.git
 
-### 1. Modifying Default Config
+# 2. Install dependencies
+npm install
+
+# 3. Start development
+npm run dev
+```
+
+---
+
+## ⚙️ API Service Description (Public Demo)
+
+To provide an out-of-the-box experience, this project includes a default set of demo endpoints.
+
+- **Service Proxying**: Default requests are proxied and controlled via **Cloudflare Workers**.
+- **Model Support**: Connected to Zhipu Bigmodel (glm-4-flash / cogview-3-flash) using free tiers.
+- **Limitations**: As these are public demo endpoints, you may encounter rate limits or exhausted quotas.
+
+---
+
+## ⚙️ Deployment & Configuration (Self-Hosting Guide)
+
+If you wish to self-host this project (e.g., for internal use or sharing with friends), we **recommend** following these steps to modify the backend service configuration to avoid rate limits on public demo endpoints.
+
+### 1. Modify Default API Config
 
 Open `src/services/config.ts` and modify the `DEFAULT_CONFIG` constant:
 
 ```typescript
 // src/services/config.ts
-
-/**
- * Default API Configuration
- * Modify this to point to your private API services
- */
 export const DEFAULT_CONFIG = {
     chat: {
         // Your Chat API endpoint (OpenAI compatible)
         // If you encounter CORS issues, use it with vite.config.ts proxy (e.g., '/api/chat')
         baseUrl: 'https://your-private-api.com/v1/chat/completions',
-        // Default model name
         model: 'gpt-4o',
-        // (Optional) If your API requires authentication, enter the key here,
-        // or leave it empty for users to enter in the frontend settings
-        apiKey: ''
+        apiKey: '' // (Optional) Recommend filling in the default Key for private deployment
     },
     image: {
-        // Your Image Generation endpoint
         baseUrl: 'https://your-private-api.com/v1/images/generations',
         model: 'dall-e-3',
         apiKey: ''
@@ -121,7 +137,6 @@ If your API does not support CORS, you can configure a proxy in `vite.config.ts`
 ```typescript
 // vite.config.ts
 export default defineConfig({
-    // ... other configs
     server: {
         proxy: {
             '/api': {
@@ -136,49 +151,10 @@ export default defineConfig({
 
 After configuring the proxy, update `baseUrl` in `config.ts` to a relative path (e.g., `/api/chat/completions`).
 
-### 3. Build Project
+### 3. Build for Production
 
 ```bash
-npm run build
-```
-
----
-
-## ⚙️ API Service Description (Public Demo)
-
-To provide an out-of-the-box experience, this project includes a default set of demo endpoints.
-
-### 1. Demo Endpoint Details
-
-- **Service Proxying**: Default requests are proxied and controlled via **Cloudflare Workers & Pages**.
-- **Model Support**: Currently connected to Zhipu Bigmodel (glm-4-flash / cogview-3-flash) using free tiers.
-- **Limitations**: As these are public demo endpoints, you may encounter rate limits or exhausted quotas.
-
-### 2. Advanced Usage (Custom Endpoints)
-
-For more stable and higher-quality generation (e.g., using GPT-4o, Claude 3.5 Sonnet, etc.), we strongly recommend configuring your own API endpoints in **Settings**:
-
-- **Base URL**: Your API proxy address (must support CORS).
-- **Model**: Target model name.
-- **API Key**: Your private key.
-
-_Note: In custom mode, requests are sent directly from your browser to the target endpoint, bypassing any intermediaries for maximum security and efficiency._
-
----
-
-## 📦 Quick Deployment
-
-```bash
-# Clone the repo
-git clone https://github.com/your-repo/ThinkFlowAI.git
-
-# Install dependencies
-npm install
-
-# Start development
-npm run dev
-
-# Build for production
+# Execute build
 npm run build
 ```
 
