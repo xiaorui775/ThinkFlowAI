@@ -102,6 +102,65 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
     const isSummarizing = ref(false)
     const summaryContent = ref('')
 
+    /**
+     * AI 思考风格
+     * - creative: 发散模式 (默认)
+     * - precise: 严谨模式
+     */
+    const aiStyle = ref(localStorage.getItem('ai_style') || 'creative')
+
+    watch(aiStyle, val => {
+        localStorage.setItem('ai_style', val)
+    })
+
+    /**
+     * 演示模式状态
+     */
+    const isPresenting = ref(false)
+    const presentationIndex = ref(-1)
+
+    /**
+     * 搜索状态
+     */
+    const searchQuery = ref('')
+    const searchResults = computed(() => {
+        if (!searchQuery.value.trim()) return []
+        const q = searchQuery.value.toLowerCase()
+        return flowNodes.value.filter(n => n.data.label?.toLowerCase().includes(q) || n.data.description?.toLowerCase().includes(q))
+    })
+
+    const focusNode = (nodeId: string) => {
+        const node = flowNodes.value.find(n => n.id === nodeId)
+        if (node) {
+            setNodes(flowNodes.value.map(n => ({ ...n, selected: n.id === nodeId })))
+            fitView({ nodes: [nodeId], padding: 2, duration: 800 })
+        }
+    }
+
+    const nextPresentationNode = () => {
+        if (flowNodes.value.length === 0) return
+        presentationIndex.value = (presentationIndex.value + 1) % flowNodes.value.length
+        focusNode(flowNodes.value[presentationIndex.value].id)
+    }
+
+    const prevPresentationNode = () => {
+        if (flowNodes.value.length === 0) return
+        presentationIndex.value = (presentationIndex.value - 1 + flowNodes.value.length) % flowNodes.value.length
+        focusNode(flowNodes.value[presentationIndex.value].id)
+    }
+
+    const togglePresentation = () => {
+        isPresenting.value = !isPresenting.value
+        if (isPresenting.value) {
+            presentationIndex.value = 0
+            if (flowNodes.value.length > 0) {
+                focusNode(flowNodes.value[0].id)
+            }
+        } else {
+            presentationIndex.value = -1
+        }
+    }
+
     const draggingNodeId = ref<string | null>(null)
     const dragLastPositionByNodeId = new Map<string, { x: number; y: number }>()
     const alignmentGuides = ref<{ x: number | null; y: number | null }>({ x: null, y: null })
@@ -875,7 +934,10 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
                 },
                 body: JSON.stringify({
                     model: useConfig.model,
-                    messages: [{ role: 'user', content: t('prompts.deepDivePrompt', { rootTopic, context, topic, detail }) }]
+                    messages: [
+                        { role: 'system', content: aiStyle.value === 'creative' ? t('prompts.styleCreative') : t('prompts.stylePrecise') },
+                        { role: 'user', content: t('prompts.deepDivePrompt', { rootTopic, context, topic, detail }) }
+                    ]
                 })
             })
 
@@ -1018,7 +1080,7 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
             }
         }
 
-        const systemPrompt = t('prompts.system')
+        const systemPrompt = t('prompts.system') + '\n' + (aiStyle.value === 'creative' ? t('prompts.styleCreative') : t('prompts.stylePrecise'))
 
         let userMessage = ''
         if (parentNode) {
@@ -1161,6 +1223,14 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
         exportMarkdown,
         generateNodeImage,
         deepDive,
-        expandIdea
+        expandIdea,
+        aiStyle,
+        isPresenting,
+        togglePresentation,
+        nextPresentationNode,
+        prevPresentationNode,
+        searchQuery,
+        searchResults,
+        focusNode
     }
 }
