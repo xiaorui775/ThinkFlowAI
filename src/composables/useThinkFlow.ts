@@ -1010,14 +1010,45 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
                                 nodes: nodesHierarchy
                             })
                         }
-                    ]
+                    ],
+                    stream: true
                 })
             })
 
             if (!response.ok) throw new Error('Summary request failed')
 
-            const data = await response.json()
-            summaryContent.value = data.choices[0].message.content
+            isSummarizing.value = false // 请求成功后立即关闭加载状态，以便展示流式内容
+
+            const reader = response.body?.getReader()
+            const decoder = new TextDecoder()
+            if (!reader) throw new Error('Failed to get reader from response')
+
+            let partialLine = ''
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                const chunk = decoder.decode(value, { stream: true })
+                const lines = (partialLine + chunk).split('\n')
+                partialLine = lines.pop() || ''
+
+                for (const line of lines) {
+                    if (line.trim() === '') continue
+                    if (line.startsWith('data: ')) {
+                        const dataStr = line.replace('data: ', '').trim()
+                        if (dataStr === '[DONE]') break
+                        try {
+                            const data = JSON.parse(dataStr)
+                            const content = data.choices[0]?.delta?.content || ''
+                            if (content) {
+                                summaryContent.value += content
+                            }
+                        } catch (e) {
+                            console.error('Error parsing SSE data:', e)
+                        }
+                    }
+                }
+            }
         } catch (error) {
             console.error('Summary Generation Error:', error)
             summaryContent.value = t('common.error.unknown')
