@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <strong>✨ 本项目 Vibe Coding 完成，基于 Gemini 3.5 Flash</strong>
+  <strong>✨ 本项目 Vibe Coding 完成，基于 Gemini 3 Flash</strong>
 </p>
 
 <p align="center">
