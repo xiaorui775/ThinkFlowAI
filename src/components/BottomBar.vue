@@ -85,7 +85,7 @@ const emit = defineEmits<{
                 class="flex items-center gap-1.5 text-slate-500 hover:text-orange-500 transition-colors"
             >
                 <Github class="w-3 h-3" />
-                <span>ThinkFlowAI</span>
+                <span>liu-ziting/ThinkFlowAI</span>
             </a>
             <!-- <span class="w-[1px] h-2 bg-slate-300 mx-1"></span> -->
             <!-- <span class="text-slate-400">By:Liuziting</span> -->
