@@ -878,13 +878,20 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
         const useConfig = apiConfig.mode === 'default' ? DEFAULT_CONFIG.chat : apiConfig.chat
         const finalApiKey = apiConfig.mode === 'default' ? useConfig.apiKey || API_KEY : useConfig.apiKey
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${finalApiKey}`
+        }
+
+        if (useConfig.baseUrl.includes('openrouter.ai')) {
+            headers['HTTP-Referer'] = window.location.origin
+            headers['X-Title'] = 'ThinkFlow AI'
+        }
+
         try {
             const response = await fetch(useConfig.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${finalApiKey}`
-                },
+                headers,
                 body: JSON.stringify({
                     model: useConfig.model,
                     stream: true,
@@ -994,13 +1001,20 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
         const useConfig = apiConfig.mode === 'default' ? DEFAULT_CONFIG.chat : apiConfig.chat
         const finalApiKey = apiConfig.mode === 'default' ? useConfig.apiKey || API_KEY : useConfig.apiKey
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${finalApiKey}`
+        }
+
+        if (useConfig.baseUrl.includes('openrouter.ai')) {
+            headers['HTTP-Referer'] = window.location.origin
+            headers['X-Title'] = 'ThinkFlow AI'
+        }
+
         try {
             const response = await fetch(useConfig.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${finalApiKey}`
-                },
+                headers,
                 body: JSON.stringify({
                     model: useConfig.model,
                     messages: [
@@ -1078,12 +1092,19 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
             const detail = node.data.description || ''
             const path = findPathToNode(nodeId)
             const context = path.length > 5 ? `... -> ${path.slice(-4).join(' -> ')}` : path.join(' -> ')
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${finalApiKey}`
+            }
+
+            if (useConfig.baseUrl.includes('openrouter.ai')) {
+                headers['HTTP-Referer'] = window.location.origin
+                headers['X-Title'] = 'ThinkFlow AI'
+            }
+
             const response = await fetch(useConfig.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${finalApiKey}`
-                },
+                headers,
                 body: JSON.stringify({
                     model: useConfig.model,
                     prompt: t('prompts.image', { topic, detail, context })
@@ -1134,12 +1155,19 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
             const path = findPathToNode(nodeId)
             const context = path.join(' -> ')
 
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${finalApiKey}`
+            }
+
+            if (useConfig.baseUrl.includes('openrouter.ai')) {
+                headers['HTTP-Referer'] = window.location.origin
+                headers['X-Title'] = 'ThinkFlow AI'
+            }
+
             const response = await fetch(useConfig.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${finalApiKey}`
-                },
+                headers,
                 body: JSON.stringify({
                     model: useConfig.model,
                     stream: true,
@@ -1340,20 +1368,30 @@ export function useThinkFlow({ t, locale }: { t: Translate; locale: Ref<string> 
         const useConfig = apiConfig.mode === 'default' ? DEFAULT_CONFIG.chat : apiConfig.chat
         const finalApiKey = apiConfig.mode === 'default' ? useConfig.apiKey || API_KEY : useConfig.apiKey
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${finalApiKey}`
+        }
+
+        // 适配 OpenRouter 特有请求头
+        if (useConfig.baseUrl.includes('openrouter.ai')) {
+            headers['HTTP-Referer'] = window.location.origin
+            headers['X-Title'] = 'ThinkFlow AI'
+        }
+
         try {
             const response = await fetch(useConfig.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${finalApiKey}`
-                },
+                headers,
                 body: JSON.stringify({
                     model: useConfig.model,
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userMessage }
                     ],
-                    response_format: { type: 'json_object' },
+                    // 注意：部分模型（如 StepFun）不支持 json_object 格式，会导致 400 错误
+                    // 鉴于我们使用了正则流式解析，且 Prompt 中已包含 JSON 约束，这里不再强制要求 json_object
+                    // response_format: { type: 'json_object' },
                     temperature: 0.8,
                     stream: true
                 })
